@@ -1,0 +1,1 @@
+export const apiHost: string = 'http://localhost:8001/';
