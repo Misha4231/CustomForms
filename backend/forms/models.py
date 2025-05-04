@@ -27,7 +27,6 @@ class Content(models.Model):
     ]
     
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=CONTENT_TYPES)
     
     text = models.TextField(blank=True, null=True)
@@ -35,7 +34,7 @@ class Content(models.Model):
     video = models.FileField(upload_to='content_videos/', blank=True, null=True)
     
     def __str__(self):
-        return f"{self.title} ({self.type})"
+        return f"{self.section.title} ({self.type})"
     
 class Question(models.Model):
     ANSWER_TYPES = [
@@ -49,7 +48,6 @@ class Question(models.Model):
     ]
     
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    question = models.CharField(max_length=150)
     answer_type = models.CharField(max_length=10, choices=ANSWER_TYPES)
     is_required = models.BooleanField(default=False)
     
@@ -57,7 +55,7 @@ class Question(models.Model):
     max_range = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.question
+        return self.section.title
     
 # for radio, checlbox and dropdown
 class QuestionOption(models.Model):
