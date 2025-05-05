@@ -17,10 +17,11 @@ const signedIn = computed(() => profileStore.id !== null);
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown" v-if="signedIn">
                             <div class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="https://lh3.google.com/u/0/ogw/AF2bZyg-KhDsy_E31BI8PUiWoh6pBFbzrsJz5DzZ2ob9K--55g=s32-c-mo" alt="avatar">
+                                <img :src="profileStore.avatar === null ? '/user.png' : profileStore.avatar" class="rounded-circle" width="30" height="30" alt="avatar">
                             </div>
                             <ul class="dropdown-menu">
                                 <li><RouterLink to="/profile" class="dropdown-item">My Profile</RouterLink></li>
+                                <li><RouterLink to="/change-password" class="dropdown-item">Change Password</RouterLink></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><RouterLink to="/logout" class="dropdown-item">Logout</RouterLink></li>
                             </ul>

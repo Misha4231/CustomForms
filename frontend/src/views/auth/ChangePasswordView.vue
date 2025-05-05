@@ -2,10 +2,9 @@
 import { ref, type Ref } from 'vue';
 import api from '@/services/RESTapi';
 import { AxiosError, type AxiosResponse } from 'axios';
-import { useProfileStore } from '@/stores/auth';
+import router from '@/router';
 
-const userInput = ref({ email: '', password: '' });
-const profileStore = useProfileStore();
+const userInput = ref({ new_password1: '', new_password2: '' });
 
 // error handling refs
 const errorMsg: Ref<string> = ref('');
@@ -22,17 +21,18 @@ const submitHandler = async (event: Event) => {
     event.preventDefault();
     try { // try to fetch
         errorMsg.value = '';
-        const response = await api.post('/auth/login/', JSON.stringify(userInput.value));
+        await api.post('/auth/password/change/', JSON.stringify(userInput.value));
 
-        await profileStore.loadUser();
-        window.location.href = '/profile' // redirect with refresh to udpate cookies
+        router.push({path: '/profile'})
     } catch (error) { // error handling
         const err = error as AxiosError<Object>; // specify a type
-        if (err.response) {
-            const data: Record<string, any> = err.response.data;
 
-            if (data.non_field_errors)
-                errorMsg.value = data.non_field_errors[0];
+        if (err.response) {
+            const data: Record<string, any> = err.response.data;     
+           
+            
+            if (data.new_password2)
+                errorMsg.value = data.new_password2[0];
         }
         
     }
@@ -43,15 +43,15 @@ const submitHandler = async (event: Event) => {
 
 <template>
     <form class="container col-md-6" @submit="submitHandler">
-        <h1 class="text-center mb-4">Sign in</h1>
+        <h1 class="text-center mb-4">Change password</h1>
 
         <div class="form-floating mb-3">
-            <input v-model="userInput.email" type="email" class="form-control" id="emailInput" placeholder="Email address" required>
-            <label for="emailInput">Email address</label>
+            <input v-model="userInput.new_password1" type="password" class="form-control" id="newPassword1Input" placeholder="New Password" required>
+            <label for="newPassword1Input">New Password</label>
         </div>
         <div class="form-floating mb-3">
-            <input v-model="userInput.password" type="password" class="form-control" id="passwordInput" placeholder="Password" required>
-            <label for="passwordInput">Password</label>
+            <input v-model="userInput.new_password2" type="password" class="form-control" id="newPassword2Input" placeholder="New Password 2" required>
+            <label for="newPassword2Input">New Password Confirmation</label>
         </div>
 
         <p v-if="errorMsg" class="text-danger" v-html="errorMsg"></p> <!--v-html to use line breaks-->
@@ -59,9 +59,5 @@ const submitHandler = async (event: Event) => {
         <div class="text-center mt-3">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
-
-        <p class="text-center mt-4">
-            Don't have an account? <RouterLink to="/sign-up">Sign Up</RouterLink>
-        </p>
     </form>
 </template>

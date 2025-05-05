@@ -7,6 +7,7 @@ import SignUpView from '@/views/auth/SignUpView.vue'
 import LogoutView from '@/views/auth/LogoutView.vue'
 import ProfileView from '@/views/user/ProfileView.vue'
 import { useProfileStore } from '@/stores/auth'
+import ChangePasswordView from '@/views/auth/ChangePasswordView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,14 @@ const router = createRouter({
       component: ProfileView,
       meta: {
         title: "Profile",
+        requiresAuth: true,
+      }
+    },
+    {
+      path: '/change-password',
+      component: ChangePasswordView,
+      meta: {
+        title: "Change Password",
         requiresAuth: true,
       }
     },

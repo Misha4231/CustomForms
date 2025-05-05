@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiHost } from "./apiHost";
+import { apiHost, getCookie } from "./apiHost";
 
 // reusable axios configuration
 const api = axios.create({
@@ -7,6 +7,7 @@ const api = axios.create({
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
     }
 })
 

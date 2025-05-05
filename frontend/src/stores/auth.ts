@@ -8,9 +8,12 @@ export const useProfileStore = defineStore('profile', {
         avatar: null as string | null
     }),
     actions: {
-        setData(id: number, avatar: string | null) {
+        setData(id: number | null, avatar: string | null) {
             this.id = id;
-            this.avatar = avatar;
+            if (avatar === '')
+                this.avatar = null;
+            else
+                this.avatar = avatar;
         },
         async loadUser() { // load user data (must be called before other actions)
             const client: ApolloClient<NormalizedCacheObject> = createApolloUserClient();
@@ -25,10 +28,10 @@ export const useProfileStore = defineStore('profile', {
                         }
                     }`
                 });
-
+                
                 this.setData(queryResult.data.me.id, queryResult.data.me.avatar);
             } catch (error) {
-                
+                this.setData(null, null);
             }
         }
     }
