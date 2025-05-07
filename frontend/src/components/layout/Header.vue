@@ -20,7 +20,7 @@ const signedIn = computed(() => profileStore.id !== null);
                                 <img :src="profileStore.avatar === null ? '/user.png' : profileStore.avatar" class="rounded-circle" width="30" height="30" alt="avatar">
                             </div>
                             <ul class="dropdown-menu">
-                                <li><RouterLink to="/profile" class="dropdown-item">My Profile</RouterLink></li>
+                                <li><RouterLink :to="'/profile/' + profileStore.id" class="dropdown-item">My Profile</RouterLink></li>
                                 <li><RouterLink to="/change-password" class="dropdown-item">Change Password</RouterLink></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><RouterLink to="/logout" class="dropdown-item">Logout</RouterLink></li>

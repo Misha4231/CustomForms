@@ -8,6 +8,7 @@ import LogoutView from '@/views/auth/LogoutView.vue'
 import ProfileView from '@/views/user/ProfileView.vue'
 import { useProfileStore } from '@/stores/auth'
 import ChangePasswordView from '@/views/auth/ChangePasswordView.vue'
+import NotFound404View from '@/views/NotFound404View.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,7 +18,7 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/profile',
+      path: '/profile/:userId(\\d+)',
       component: ProfileView,
       meta: {
         title: "Profile",
@@ -52,6 +53,13 @@ const router = createRouter({
       meta: {
         title: "Logout",
         requiresAuth: true,
+      }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      component: NotFound404View,
+      meta: {
+        title: "Page not found",
       }
     },
   ],

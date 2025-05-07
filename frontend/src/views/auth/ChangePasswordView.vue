@@ -3,8 +3,10 @@ import { ref, type Ref } from 'vue';
 import api from '@/services/RESTapi';
 import { AxiosError, type AxiosResponse } from 'axios';
 import router from '@/router';
+import { useProfileStore } from '@/stores/auth';
 
 const userInput = ref({ new_password1: '', new_password2: '' });
+const profileStore = useProfileStore();
 
 // error handling refs
 const errorMsg: Ref<string> = ref('');
@@ -23,7 +25,7 @@ const submitHandler = async (event: Event) => {
         errorMsg.value = '';
         await api.post('/auth/password/change/', JSON.stringify(userInput.value));
 
-        router.push({path: '/profile'})
+        router.push({path: `/profile/${profileStore.id}`})
     } catch (error) { // error handling
         const err = error as AxiosError<Object>; // specify a type
 

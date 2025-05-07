@@ -10,8 +10,12 @@ class UserType(DjangoObjectType):
         
 class Query(graphene.ObjectType):
     me = graphene.Field(UserType)
+    profile = graphene.Field(UserType, id=graphene.Int())
     
     def resolve_me(root, info: graphene.ResolveInfo):
         return info.context.user
+    
+    def resolve_profile(root, info: graphene.ResolveInfo, id):
+        return User.objects.get(pk=id)
     
 schema = graphene.Schema(query=Query)

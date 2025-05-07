@@ -25,7 +25,7 @@ const submitHandler = async (event: Event) => {
         const response = await api.post('/auth/login/', JSON.stringify(userInput.value));
 
         await profileStore.loadUser();
-        window.location.href = '/profile' // redirect with refresh to udpate cookies
+        window.location.href = `/profile/${response.data.user.pk}` // redirect with refresh to udpate cookies
     } catch (error) { // error handling
         const err = error as AxiosError<Object>; // specify a type
         if (err.response) {
