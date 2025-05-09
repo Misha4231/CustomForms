@@ -1,4 +1,5 @@
 <script setup>
+import { mediaHost } from '@/services/apiHost';
 import { useProfileStore } from '@/stores/auth';
 import { computed } from 'vue';
 
@@ -17,7 +18,7 @@ const signedIn = computed(() => profileStore.id !== null);
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown" v-if="signedIn">
                             <div class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img :src="profileStore.avatar === null ? '/user.png' : profileStore.avatar" class="rounded-circle" width="30" height="30" alt="avatar">
+                                <img :src="profileStore.avatar === null ? '/user.png' :  mediaHost + profileStore.avatar" class="rounded-circle" width="30" height="30" alt="avatar">
                             </div>
                             <ul class="dropdown-menu">
                                 <li><RouterLink :to="'/profile/' + profileStore.id" class="dropdown-item">My Profile</RouterLink></li>

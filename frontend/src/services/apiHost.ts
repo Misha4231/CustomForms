@@ -13,4 +13,5 @@ export function getCookie(name: string) { // get cookie (used to search for csrf
     return res;
 }
 
-export const apiHost: string = 'http://localhost:8001/';
+export const apiHost: string = 'http://localhost:8000/';
+export const mediaHost: string = apiHost + 'media/';

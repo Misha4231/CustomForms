@@ -9,6 +9,7 @@ import ProfileView from '@/views/user/ProfileView.vue'
 import { useProfileStore } from '@/stores/auth'
 import ChangePasswordView from '@/views/auth/ChangePasswordView.vue'
 import NotFound404View from '@/views/NotFound404View.vue'
+import FormEditorView from '@/views/form/FormEditorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,6 +54,14 @@ const router = createRouter({
       meta: {
         title: "Logout",
         requiresAuth: true,
+      }
+    },
+    {
+      path: '/form-editor/:formId(\\d+)',
+      component: FormEditorView,
+      meta: {
+        title: "Form Editor",
+        requiresAuth: true
       }
     },
     {
