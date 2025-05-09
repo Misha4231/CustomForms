@@ -2,11 +2,12 @@ import { ApolloClient, HttpLink, type NormalizedCacheObject } from "@apollo/clie
 import { InMemoryCache } from "@apollo/client/core";
 import { setContext } from '@apollo/client/link/context';
 import { apiHost, getCookie } from "./apiHost";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 let apolloUserClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 // create appolo client for graphQL queries
-export function createApolloUserClient() {
+export function createApolloClient() {
     if (apolloUserClient) return apolloUserClient;
 
     const csrfLink = setContext((_, { headers }) => { // headers with csrf token included for session purpose
@@ -19,8 +20,8 @@ export function createApolloUserClient() {
         };
     });
 
-    const httpLink = new HttpLink({
-        uri: `${apiHost}users/graphql/`,
+    const httpLink = createUploadLink({
+        uri: `${apiHost}graphql/`,
         credentials: 'include',
     });
 

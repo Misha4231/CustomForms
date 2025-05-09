@@ -34,16 +34,6 @@ class AnswerType(DjangoObjectType):
         model = Answer
         fields = ('id', 'submitted_at', 'short_text', 'long_text', 'range_value', 'date_value')
 
-class Query(graphene.ObjectType):
-    all_forms = graphene.Field(FormType, id=graphene.Int())
-    all_sections = graphene.List(SectionType, id=graphene.Int())
-    
-    def resolve_all_forms(root, info, id):
-        return Form.objects.get(pk=id)
-
-    def resolve_all_sections(root, info, id):
-        return Section.objects.filter(form=id)
-
 
 class FormCreateMutation(graphene.Mutation):
     class Arguments:
@@ -79,8 +69,16 @@ class FormUpdateMutation(graphene.Mutation):
         return FormUpdateMutation(form=form)
         
 
+class Query(graphene.ObjectType):
+    all_forms = graphene.Field(FormType, id=graphene.Int())
+    all_sections = graphene.List(SectionType, id=graphene.Int())
+    
+    def resolve_all_forms(root, info, id):
+        return Form.objects.get(pk=id)
+
+    def resolve_all_sections(root, info, id):
+        return Section.objects.filter(form=id)
+    
 class Mutation(graphene.ObjectType):
     create_form = FormCreateMutation.Field()
     update_form = FormUpdateMutation.Field()
-
-schema = graphene.Schema(query=Query, mutation=Mutation)
