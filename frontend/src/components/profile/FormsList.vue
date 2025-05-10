@@ -12,10 +12,10 @@ const props = defineProps<{
 const forms = ref<{id: number, title: string, description: string}[]>([])
 const fetchForms = async() => {
     const client = createApolloClient();
-
+    
     const response = await client.query({
         query: gql`
-            query getAllForms($userId: Int) {
+            query getAllForms($userId: Int!) {
                 allUserForms(userId: $userId) {
                     id
                     title
@@ -27,7 +27,7 @@ const fetchForms = async() => {
             userId: props.userId
         }
     });
-
+    
     forms.value = response.data.allUserForms;
 }
 onMounted(async () => {
@@ -60,7 +60,7 @@ const addForm = async() => {
     
     const id = await fetch(); // Wait for DOM to reflect the change
     setTimeout(() => {
-        router.push(`/form-editor/${id}`);
+        router.push({path: '/form/' + id, query: {editor: 1}});
     }, 100);
 }
 </script>
@@ -71,7 +71,7 @@ const addForm = async() => {
             <div class="card-body">
                 <h5 class="card-title">{{ form.title ? form.title : "No title" }}</h5>
                 <p class="card-text">{{ form.description }}</p>
-                <RouterLink :to="'/form-editor/' + form.id" class="btn btn-primary">Edit -></RouterLink>
+                <RouterLink :to="{path: '/form/' + form.id, query: {editor: 1}}" class="btn btn-primary">Edit -></RouterLink>
             </div>
         </div>
         <div @click="addForm" class="card" style="width: min-content;height: min-content;cursor: pointer;text-decoration: none;">

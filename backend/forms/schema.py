@@ -27,30 +27,36 @@ class FormCreateMutation(graphene.Mutation):
 class FormUpdateMutation(graphene.Mutation):
     class Arguments:
         id = graphene.ID()
-        title = graphene.String(required=True)
+        title = graphene.String()
         description = graphene.String()
     
     form = graphene.Field(FormType)
     
     @classmethod
-    def mutate(cls, root, info, id, title, description=None):
+    def mutate(cls, root, info, id, title=None, description=None):
         form = Form.objects.get(pk=id)
-        form.title = title
-        form.description = description
+        if title != None: # can be empty string
+            form.title = title
+        if description != None:
+            form.description = description
         form.save()
         
         return FormUpdateMutation(form=form)
         
 
 class Query(graphene.ObjectType):
-    all_user_forms = graphene.List(FormType, userId=graphene.Int())
-    all_sections = graphene.List(SectionType, id=graphene.Int())
-    
+    all_user_forms = graphene.List(FormType, userId=graphene.Int(required=True))
+    form = graphene.Field(FormType, id=graphene.Int(required=True))
+    sections_by_form = graphene.List(SectionType, form_id=graphene.ID(required=True))
+
     def resolve_all_user_forms(root, info, userId):
         return Form.objects.filter(owner__id=userId).order_by('-pk')
 
-    def resolve_all_sections(root, info, id):
-        return Section.objects.filter(form=id)
+    def resolve_form(root, info, id):
+        return Form.objects.get(pk=id)
+
+    def resolve_sections_by_form(root, info, form_id):
+        return Section.objects.filter(form__id=form_id)
     
 class Mutation(graphene.ObjectType):
     create_form = FormCreateMutation.Field()

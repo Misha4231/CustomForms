@@ -57,7 +57,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/form-editor/:formId(\\d+)',
+      path: '/form/:formId(\\d+)',
       component: FormEditorView,
       meta: {
         title: "Form Editor",
