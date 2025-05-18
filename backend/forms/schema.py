@@ -48,6 +48,7 @@ class Query(graphene.ObjectType):
     all_user_forms = graphene.List(FormType, userId=graphene.Int(required=True))
     form = graphene.Field(FormType, id=graphene.Int(required=True))
     sections_by_form = graphene.List(SectionType, form_id=graphene.ID(required=True))
+    section_options = graphene.List(QuestionOptionType, section_id=graphene.ID(required=True))
 
     def resolve_all_user_forms(root, info, userId):
         return Form.objects.filter(owner__id=userId).order_by('-pk')
@@ -57,6 +58,9 @@ class Query(graphene.ObjectType):
 
     def resolve_sections_by_form(root, info, form_id):
         return Section.objects.filter(form__id=form_id)
+    
+    def resolve_section_options(root, info, section_id):
+        return QuestionOption.objects.select_related('question__section').filter(question__section__id=section_id)
     
 class Mutation(graphene.ObjectType):
     create_form = FormCreateMutation.Field()

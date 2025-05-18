@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { mediaHost } from '@/services/apiHost';
 import { defineProps } from 'vue';
 
 defineProps<{

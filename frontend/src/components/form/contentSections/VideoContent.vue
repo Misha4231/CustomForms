@@ -14,14 +14,17 @@ defineProps<{
 
 <template>
   <div class="content-image-wrapper">
-    <video-player
+    <div class="video-wrapper">
+      <video-player
         :src="mediaHost + data.video"
         controls
-        :fluid="true"
-    />
+        :height="350"
+      />
+    </div>
     <div class="mt-3" v-if="isEditable">
       <label class="form-label">Upload new Video</label>
       <input class="form-control" type="file" />
     </div>
   </div>
 </template>
+

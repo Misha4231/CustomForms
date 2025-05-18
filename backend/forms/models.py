@@ -26,7 +26,7 @@ class Content(models.Model):
         ('video', 'Video')
     ]
     
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    section = models.OneToOneField(Section, on_delete=models.CASCADE)
     type = models.CharField(max_length=10, choices=CONTENT_TYPES)
     
     text = models.TextField(blank=True, null=True)
@@ -42,12 +42,11 @@ class Question(models.Model):
         ('long', "Long answer"),
         ('radio', 'Multiple choice'),
         ('checkbox', 'Checkboxes'),
-        ('dropdown', 'Dropdown'),
         ('range', 'Linear scale'),
         ('date', 'Date')
     ]
     
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    section = models.OneToOneField(Section, on_delete=models.CASCADE)
     answer_type = models.CharField(max_length=10, choices=ANSWER_TYPES)
     is_required = models.BooleanField(default=False)
     

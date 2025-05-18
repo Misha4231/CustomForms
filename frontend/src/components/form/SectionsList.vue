@@ -45,7 +45,6 @@ onMounted(async() => {
     });
     
     sections.splice(0, sections.length, ...response.data.sectionsByForm);
-    console.log(sections);
 });
 
 </script>
