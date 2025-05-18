@@ -2,11 +2,12 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django import DjangoListField
 from graphql import GraphQLError
+from django.db.models import Max, F
 
 from .models import Form, Section, Content, Question, QuestionOption, Answer
 from users.models import User
 from .types import *
-
+from .decorstors import form_owner, form_owner_section_id
 
 class FormCreateMutation(graphene.Mutation):
     class Arguments:
@@ -43,6 +44,55 @@ class FormUpdateMutation(graphene.Mutation):
         
         return FormUpdateMutation(form=form)
         
+class SectionCreateMutation(graphene.Mutation):
+    class Arguments:
+        form_id = graphene.ID()
+        type = graphene.String()
+        order = graphene.Int()
+
+    section = graphene.Field(SectionType)
+
+    @classmethod
+    @form_owner
+    def mutate(cls, root, info, form, type = 'question', order = 0):
+        sections = Section.objects.filter(form=form)
+
+        max_order = sections.aggregate(Max('order'))['order__max'] or 0 # get the maximum order value from sections
+        if order > max_order + 1: # if order argument is grater then the maximum possible order
+            order = max_order + 1
+    
+        # increment order of sections at or after the desired insert position
+        sections.filter(order__gte=order).update(order=F('order') + 1)
+
+        # create new section
+        section = Section.objects.create(
+            title='',
+            form=form,
+            type='question' if type == 'question' else 'content',
+            order=order
+        )
+
+        if type == 'question':
+            Question.objects.create(section=section, answer_type='short')
+        else:
+            Content.objects.create(section=section, type=type)
+
+        return SectionCreateMutation(section)
+
+class SectionRemoveMutation(graphene.Mutation):
+    class Arguments:
+        section_id = graphene.ID()
+
+    ok = graphene.Boolean()
+
+    @classmethod
+    @form_owner_section_id
+    def mutate(cls, root, info, form: Form, section: Section):
+        Section.objects.filter(form=form, order__gt=section.order).update(order=F('order') - 1)
+
+        section.delete()
+        return SectionRemoveMutation(True)
+        
 
 class Query(graphene.ObjectType):
     all_user_forms = graphene.List(FormType, userId=graphene.Int(required=True))
@@ -57,7 +107,7 @@ class Query(graphene.ObjectType):
         return Form.objects.get(pk=id)
 
     def resolve_sections_by_form(root, info, form_id):
-        return Section.objects.filter(form__id=form_id)
+        return Section.objects.filter(form__id=form_id).order_by('order')
     
     def resolve_section_options(root, info, section_id):
         return QuestionOption.objects.select_related('question__section').filter(question__section__id=section_id)
@@ -65,3 +115,5 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     create_form = FormCreateMutation.Field()
     update_form = FormUpdateMutation.Field()
+    add_section = SectionCreateMutation.Field()
+    remove_section = SectionRemoveMutation.Field()

@@ -48,8 +48,12 @@ function removeOptionHandler(id: string) {
           <label v-if="!isEditable" class="form-check-label" :for="'optionChoice' + sectionId + question.id">{{ question.text }}</label>
           <input v-else type="text" class="form-control w-50" v-model="question.text">
 
-          <button v-if="isEditable" type="button" class="btn btn-danger ms-2" @click="() => removeOptionHandler(question.id)">-</button>
+          <button v-if="isEditable" type="button" class="btn btn-danger ms-2" @click="() => removeOptionHandler(question.id)">
+            <img src="/icons8-delete-48.png" width="20" alt="-">
+          </button>
         </div>
-        <button v-if="isEditable" type="button" class="btn btn-success mt-2" @click="addOptionHandler">+</button>
+        <button v-if="isEditable" type="button" class="btn btn-success mt-2" @click="addOptionHandler">
+          <img src="/icons8-add-100.png" width="30" alt="+">
+        </button>
     </div>
 </template>

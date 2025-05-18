@@ -15,6 +15,7 @@ class Section(models.Model):
     title = models.CharField(max_length=100)
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
     type = models.CharField(choices=[('question', 'Question'), ('content', 'Content')])
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.form.title}: {self.title}"
