@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FormHeader from '@/components/form/FormHeader.vue';
+import SectionsList from '@/components/form/SectionsList.vue';
 import router from '@/router';
 import { createApolloClient } from '@/services/graphQL';
 import { useProfileStore } from '@/stores/auth';
@@ -49,6 +50,11 @@ onMounted(async () => {
 
 <template>
     <FormHeader
+        :isEditable="isEditable"
+        :formId="formId"
+    />
+
+    <SectionsList
         :isEditable="isEditable"
         :formId="formId"
     />

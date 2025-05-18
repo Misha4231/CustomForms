@@ -54,23 +54,9 @@ class SectionType(DjangoObjectType):
         if content:
             return content
         
-        return Question.objects.filter(section=self).filter()
+        return Question.objects.filter(section=self).first()
 
 class AnswerType(DjangoObjectType):
     class Meta:
         model = Answer
         fields = "__all__"
-
-'''
-query section($form_id: ID!) {
-  sectionsByForm(formId: $form_id){
-    title
-    item {
-      __typename
-      ... on ContentType {
-        text
-      }
-    }
-  }
-}
-'''

@@ -13,11 +13,13 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
+    "@videojs-player/vue": "^1.0.0",
     "@vue/apollo-composable": "^4.2.2",
     "apollo-upload-client": "^18.0.1",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "pinia": "^3.0.1",
+    "video.js": "^8.22.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },

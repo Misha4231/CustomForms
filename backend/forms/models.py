@@ -40,7 +40,7 @@ class Question(models.Model):
     ANSWER_TYPES = [
         ('short', 'Short answer'),
         ('long', "Long answer"),
-        ('radio', 'Nultiple choice'),
+        ('radio', 'Multiple choice'),
         ('checkbox', 'Checkboxes'),
         ('dropdown', 'Dropdown'),
         ('range', 'Linear scale'),
