@@ -93,6 +93,51 @@ class SectionRemoveMutation(graphene.Mutation):
         section.delete()
         return SectionRemoveMutation(True)
         
+class SectionUpdateMutation(graphene.Mutation):
+    class Arguments:
+        section_id = graphene.ID(required=True)
+        title = graphene.String()
+        content = ContentInputType()
+        question = QuestionInputType()
+
+    section = graphene.Field(SectionType)
+
+    @classmethod
+    @form_owner_section_id
+    def mutate(cls, root, info, form: Form, section: Section, title=None, content=None, question=None):
+        if title:
+            section.title = title
+            section.save()
+
+        if section.type == 'content' and content:
+            content_obj = Content.objects.get(section=section)
+            
+            content_obj.type = content.type
+            content_obj.text = content.text
+            
+            # if media is not attached, leave the same
+            content_obj.image = content.image or content_obj.image
+            content_obj.video = content.video or content_obj.video
+
+            content_obj.save()
+        elif section.type == 'question' and question:
+            question_obj = Question.objects.get(section=section)
+
+            question_obj.answer_type = question.answer_type
+            question_obj.is_required = question.is_required or False
+            question_obj.min_range = question.min_range
+            question_obj.max_range = question.max_range
+            question_obj.save()
+
+            if question.options:
+                QuestionOption.objects.filter(question=question_obj).delete()
+                for option_input in question.options:
+                    QuestionOption.objects.create(question = question_obj, text=option_input.text)
+            else:
+                QuestionOption.objects.filter(question=question_obj).delete()
+
+        return SectionUpdateMutation(section)
+
 
 class Query(graphene.ObjectType):
     all_user_forms = graphene.List(FormType, userId=graphene.Int(required=True))
@@ -117,3 +162,4 @@ class Mutation(graphene.ObjectType):
     update_form = FormUpdateMutation.Field()
     add_section = SectionCreateMutation.Field()
     remove_section = SectionRemoveMutation.Field()
+    update_section = SectionUpdateMutation.Field()

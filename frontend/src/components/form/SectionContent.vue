@@ -1,5 +1,4 @@
 <script setup lang="ts">
-    import { mediaHost } from '@/services/apiHost';
     import { computed, defineProps, ref, watch } from 'vue';
     import ImageContent from './contentSections/ImageContent.vue';
     import VideoContent from './contentSections/VideoContent.vue';
@@ -14,7 +13,8 @@
             video: string
         },
         sectionId: string,
-        isEditable: boolean
+        isEditable: boolean,
+        updateContent: (sectionId: number, data: any) => void;
     }>();
     
     const selectedType = ref(props.data.type);
@@ -38,6 +38,7 @@
             :data="props.data"
             :isEditable="props.isEditable"
             :sectionId="props.sectionId"
+            :updateContent="updateContent"
         />
 
         <div class="content-types-select" style="width: 20%;" v-if="isEditable">

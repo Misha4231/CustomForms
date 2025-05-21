@@ -14,7 +14,8 @@ import DateQuestion from './questionSections/DateQuestion.vue';
             minRange: number | null
         },
         sectionId: string,
-        isEditable: boolean
+        isEditable: boolean,
+        updateContent: (sectionId: number, data: any) => void;
     }>()
     
     const selectedType = ref(props.data.answerType);
@@ -40,15 +41,27 @@ import DateQuestion from './questionSections/DateQuestion.vue';
                 data: props.data,
                 isEditable: props.isEditable,
                 sectionId: props.sectionId,
-                questionType: selectedType.value // pass to OptionedQuestion
+                questionType: selectedType.value, // pass to OptionedQuestion
+                updateContent: props.updateContent
             };
         }
         return {
             data: props.data,
             isEditable: props.isEditable,
-            sectionId: props.sectionId
+            sectionId: props.sectionId,
+            updateContent: props.updateContent
         };
     });
+
+    function handleTypeChange(event: Event) {
+        const t = event.target as HTMLSelectElement;
+        
+        props.updateContent(parseInt(props.sectionId), {
+            question: {
+                answerType: t.value as string
+            }
+        })
+    }
 </script>
 
 <template>
@@ -60,7 +73,7 @@ import DateQuestion from './questionSections/DateQuestion.vue';
 
         <div class="question-types-select" style="width: 20%;" v-if="isEditable">
             <span>Question Type: </span>
-            <select class="form-select" v-model="selectedType">
+            <select class="form-select" v-model="selectedType" @change="handleTypeChange">
                 <option value="SHORT">Short answer</option>
                 <option value="LONG">Long answer</option>
                 <option value="RADIO">Multiple choice</option>

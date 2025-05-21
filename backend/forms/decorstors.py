@@ -31,7 +31,7 @@ def form_owner_section_id(func):
         try:
             section = Section.objects.select_related('form').get(pk=section_id)
         except Section.DoesNotExist:
-            raise GraphQLError("Session does not exist")
+            raise GraphQLError("Section does not exist")
         
         form_id = section.form.id
         

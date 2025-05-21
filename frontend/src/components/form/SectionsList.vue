@@ -49,7 +49,10 @@ onMounted(async() => {
         }
     });
     
-    sections.splice(0, sections.length, ...response.data.sectionsByForm);
+    // make clone to avoid apollo client lock
+    const clonedSections = JSON.parse(JSON.stringify(response.data.sectionsByForm));
+    sections.splice(0, sections.length, ...clonedSections);
+    
     if (sections.length > 0) selectedSectionId.value = sections[0].id;
 });
 
@@ -113,11 +116,30 @@ async function handleRemoveSection(id: number) {
     }
 }
 
-
+// ========== SELECTION MANAGEMENT
 const selectedSectionId = ref();
 function handleSectionClick(id: string) {
     selectedSectionId.value = id;
 }
+
+// ========== CONTENT UPDATE
+const {mutate: updateSection} = useMutation(gql`
+        mutation updateSection($section_id: ID!, $title: String, $content: ContentInputType, $question: QuestionInputType) {
+            updateSection(sectionId: $section_id, title: $title, content: $content, question: $question) {
+                section {
+                    title
+                }
+            }
+        }
+    `);
+
+async function handleContentUpdate(sectionId: number, data: object) {    
+    const response = await updateSection({
+        section_id: sectionId,
+        ...data
+    });
+}
+
 </script>
 
 <template>
@@ -131,18 +153,20 @@ function handleSectionClick(id: string) {
                 </div>
 
                 <div class="rounded bg-secondary p-4 shadow">
-                    <input v-model="section.title" v-if="isEditable" type="text" class="form-control form-control-medium bg-dark text-light border-0 mb-3" :placeholder="section.item.__typename == 'ContentType' ? 'Section title' : 'Question'">
+                    <input v-model="section.title" @change="(e) => handleContentUpdate(section.id, {title: (e.target as HTMLInputElement).value})" v-if="isEditable" type="text" class="form-control form-control-medium bg-dark text-light border-0 mb-3" :placeholder="section.item.__typename == 'ContentType' ? 'Section title' : 'Question'">
                     <h3 v-else>{{ section.title }} <span v-if="section.item.__typename == 'QuestionType' && section.item.isRequired">*</span></h3>
                     
                     <SectionContent v-if="section.item.__typename == 'ContentType'"
                         :data="section.item"
                         :sectionId="section.id"
                         :isEditable="isEditable"
+                        :updateContent="handleContentUpdate"
                     />
                     <SectionQuestion v-else
                         :data="section.item"
                         :sectionId="section.id"
                         :isEditable="isEditable"
+                        :updateContent="handleContentUpdate"
                     />
 
                     <div class="remove-section d-flex justify-content-end" v-if="selectedSectionId == section.id && isEditable">
