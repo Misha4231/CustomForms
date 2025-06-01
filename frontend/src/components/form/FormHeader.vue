@@ -62,17 +62,44 @@ onMounted(async() => {
     form.title = response.data.form.title;
     form.description = response.data.form.description;
 });
+
+// get link without GET param
+const shareLink = window.location.href.split("?")[0];
 </script>
 
 <template>
     <div class="container d-flex justify-content-center">
         <div class="w-100" style="max-width: 900px;">
             <div class="rounded bg-secondary p-4 shadow">
-                <input v-if="isEditable" @change="titleChagned" :value="form.title" type="text" class="form-control form-control-lg bg-dark text-light border-0 mb-3" placeholder="Form title">
-                <h1 v-else>{{ form.title }}</h1>
+                <div class="d-flex align-items-center gap-2">
+                    <input v-if="isEditable" @change="titleChagned" :value="form.title" type="text" class="form-control form-control-lg bg-dark text-light border-0 mb-3" placeholder="Form title">
+                    <h1 class="mb-3" v-else>{{ form.title }}</h1>
+
+                    <button v-if="isEditable" class="btn btn-success mb-3" type="button" data-bs-toggle="modal" data-bs-target="#shareModal">
+                        <img height="35" src="/icons8-share-90.png" alt="Share form">
+                    </button>
+                </div>
 
                 <textarea v-if="isEditable" @change="descriptionChagned" :value="form.description" class="form-control bg-dark text-light border-0" rows="5" placeholder="Form description"></textarea>
                 <p v-else>{{ form.description }}</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share this form</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <a :href="shareLink">{{ shareLink }}</a> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
             </div>
         </div>
     </div>

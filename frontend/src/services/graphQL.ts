@@ -28,5 +28,15 @@ export function createApolloClient() {
     return apolloUserClient = new ApolloClient({
         link: csrfLink.concat(httpLink),
         cache: new InMemoryCache(),
+        defaultOptions: {
+            watchQuery: {
+                fetchPolicy: 'no-cache',
+                errorPolicy: 'all'
+            },
+            query: {
+                fetchPolicy: 'no-cache',
+                errorPolicy: 'all'
+            }
+        }
     })
 }

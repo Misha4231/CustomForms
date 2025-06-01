@@ -67,11 +67,12 @@ const addForm = async() => {
 
 <template>
     <div class="d-flex flex-row flex-wrap gap-3">
-        <div v-for="form in forms" :key="'form.id'" class="card" style="width: 10rem;">
+        <div v-for="form in forms" :key="'form.id'" class="card" style="width: 15rem;">
             <div class="card-body">
                 <h5 class="card-title">{{ form.title ? form.title : "No title" }}</h5>
                 <p class="card-text">{{ form.description }}</p>
-                <RouterLink :to="{path: '/form/' + form.id, query: {editor: 1}}" class="btn btn-primary">Edit -></RouterLink>
+                <RouterLink :to="{path: '/form/' + form.id, query: {editor: 1}}" class="btn btn-primary mb-2">Edit -></RouterLink><br>
+                <RouterLink :to="{path: '/submissions/' + form.id}" class="btn btn-success">Submissions -></RouterLink>
             </div>
         </div>
         <div @click="addForm" class="card" style="width: min-content;height: min-content;cursor: pointer;text-decoration: none;">

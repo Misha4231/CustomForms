@@ -10,6 +10,8 @@ import { useProfileStore } from '@/stores/auth'
 import ChangePasswordView from '@/views/auth/ChangePasswordView.vue'
 import NotFound404View from '@/views/NotFound404View.vue'
 import FormEditorView from '@/views/form/FormEditorView.vue'
+import AnswersListView from '@/views/form/AnswersListView.vue'
+import SubmisionView from '@/views/form/SubmisionView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +63,22 @@ const router = createRouter({
       component: FormEditorView,
       meta: {
         title: "Form Editor",
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/submissions/:formId(\\d+)',
+      component: AnswersListView,
+      meta: {
+        title: "Submissions List",
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/submission/:submissionId(\\d+)',
+      component: SubmisionView,
+      meta: {
+        title: "Submission",
         requiresAuth: true
       }
     },

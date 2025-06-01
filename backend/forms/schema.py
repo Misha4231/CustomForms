@@ -1,13 +1,13 @@
 import graphene
-from graphene_django import DjangoObjectType
-from graphene_django import DjangoListField
+import datetime
 from graphql import GraphQLError
 from django.db.models import Max, F
+from django.db import transaction
 
-from .models import Form, Section, Content, Question, QuestionOption, Answer
-from users.models import User
+from .models import Form, Section, Content, Question, QuestionOption, Answer, Submition
 from .types import *
 from .decorstors import form_owner, form_owner_section_id
+from users.decorators import login_required
 
 class FormCreateMutation(graphene.Mutation):
     class Arguments:
@@ -138,12 +138,76 @@ class SectionUpdateMutation(graphene.Mutation):
 
         return SectionUpdateMutation(section)
 
+class SubmitAnswerMutation(graphene.Mutation):
+    class Arguments:
+        form_id = graphene.ID()
+        answers = graphene.List(AnswerInputType)
+
+    submission = graphene.Field(SubmitionType)
+
+    @classmethod
+    @login_required
+    def mutate(cls, root, info, form_id, answers):
+        saved_answers = []
+
+        form = Form.objects.get(pk=form_id)
+        submission = Submition.objects.create(
+                user=info.context.user,
+                form=form,
+                submitted_at=datetime.datetime.now()
+        )
+        try:
+            with transaction.atomic():
+                for answer in answers:
+                    section = Section.objects.select_related('form').get(pk=answer.id)
+                    question = Question.objects.get(section=section)
+                    
+                    new_answer = Answer()
+                    new_answer.question = question
+                    new_answer.submition = submission
+                    
+                    type = question.answer_type.lower()
+                    if type == 'short':
+                        new_answer.short_text = answer.text
+                    elif type == 'long':
+                        new_answer.long_text = answer.text
+                    elif type == 'checkbox':
+                        new_answer.save()  # Save first to allow M2M assignment
+                        selected_options = [QuestionOption.objects.get(pk=opt_id) for opt_id in answer.options]
+                        new_answer.selected_options.set(selected_options)
+                    elif type == 'radio':
+                        new_answer.save()  # Save first to allow M2M assignment
+                        selected_option = [QuestionOption.objects.get(pk=answer.option)]
+                        new_answer.selected_options.set(selected_option)
+                    elif type == 'range':
+                        new_answer.range_value = answer.rangeVal
+                    else:
+                        new_answer.date_value = answer.date
+
+                    new_answer.save()
+                    saved_answers.append(new_answer)
+
+                submission.save()
+
+        except Section.DoesNotExist:
+            raise GraphQLError("Section does not exist")
+        except Question.DoesNotExist:
+            raise GraphQLError("Question does not exist")
+        except QuestionOption.DoesNotExist:
+            raise GraphQLError("One or more selected options do not exist")
+        except Exception as e:
+            raise GraphQLError(f"Unexpected error: {str(e)}")
+
+        return SubmitAnswerMutation(submission=submission)
+
 
 class Query(graphene.ObjectType):
     all_user_forms = graphene.List(FormType, userId=graphene.Int(required=True))
     form = graphene.Field(FormType, id=graphene.Int(required=True))
     sections_by_form = graphene.List(SectionType, form_id=graphene.ID(required=True))
     section_options = graphene.List(QuestionOptionType, section_id=graphene.ID(required=True))
+    get_submitions = graphene.List(SubmitionType, form_id=graphene.ID(required=True))
+    answers = graphene.List(AnswerType, submission_id=graphene.ID(required=True))
 
     def resolve_all_user_forms(root, info, userId):
         return Form.objects.filter(owner__id=userId).order_by('-pk')
@@ -157,9 +221,16 @@ class Query(graphene.ObjectType):
     def resolve_section_options(root, info, section_id):
         return QuestionOption.objects.select_related('question__section').filter(question__section__id=section_id)
     
+    def resolve_get_submitions(root, info, form_id):
+        return Submition.objects.filter(form__id = form_id).order_by('submitted_at')
+    
+    def resolve_answers(root, info, submission_id):
+        return Answer.objects.filter(submition__id = submission_id)
+
 class Mutation(graphene.ObjectType):
     create_form = FormCreateMutation.Field()
     update_form = FormUpdateMutation.Field()
     add_section = SectionCreateMutation.Field()
     remove_section = SectionRemoveMutation.Field()
     update_section = SectionUpdateMutation.Field()
+    submit_answer = SubmitAnswerMutation.Field()

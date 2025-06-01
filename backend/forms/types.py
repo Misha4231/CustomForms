@@ -2,7 +2,7 @@ from graphene_django import DjangoObjectType
 import graphene
 from graphene_file_upload.scalars import Upload
 
-from .models import Form, Section, Content, Question, QuestionOption, Answer
+from .models import Form, Section, Content, Question, QuestionOption, Answer, Submition
 
 
 class FormType(DjangoObjectType):
@@ -30,6 +30,11 @@ class QuestionType(DjangoObjectType):
     def resolve_options(self, info):
         return self.options.all()
         
+class SubmitionType(DjangoObjectType):
+    class Meta:
+        model = Submition
+        fields = '__all__'
+
 class SectionItemType(graphene.Union):
     class Meta:
         types = (ContentType, QuestionType)
@@ -82,3 +87,11 @@ class ContentInputType(graphene.InputObjectType):
     text = graphene.String()
     image = Upload()
     video = Upload()
+
+class AnswerInputType(graphene.InputObjectType):
+    id = graphene.ID(required=True)
+    text = graphene.String()
+    options = graphene.List(graphene.ID)
+    option = graphene.ID()
+    rangeVal = graphene.Int()
+    date = graphene.Date()

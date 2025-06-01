@@ -65,11 +65,14 @@ class QuestionOption(models.Model):
     def __str__(self):
         return self.text
     
-    
-class Answer(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+class Submition(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     submitted_at = models.DateTimeField(auto_now_add=True)
+    form = models.ForeignKey(Form, on_delete=models.CASCADE, blank=True, null=True)
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    submition = models.ForeignKey(Submition, on_delete=models.CASCADE)
     
     short_text = models.CharField(max_length=255, blank=True, null=True)
     long_text = models.TextField(blank=True, null=True)
@@ -78,7 +81,7 @@ class Answer(models.Model):
     date_value = models.DateField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.user} - {self.question}"
+        return f"{self.submition.user} - {self.question}"
 
     def get_value(self):
         # Helper to get the actual answer value in a generic way

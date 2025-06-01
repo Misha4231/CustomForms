@@ -13,6 +13,11 @@ const props = defineProps<{
 }>();
 
 let sections = reactive<any[]>([]);
+let answers = reactive<any[]>([]);
+
+defineExpose({
+    answers
+});
 
 // =============== GET SECTIONS
 onMounted(async() => {
@@ -50,10 +55,29 @@ onMounted(async() => {
     });
     
     // make clone to avoid apollo client lock
-    const clonedSections = JSON.parse(JSON.stringify(response.data.sectionsByForm));
+    const clonedSections = JSON.parse(JSON.stringify(response.data.sectionsByForm));    
     sections.splice(0, sections.length, ...clonedSections);
     
     if (sections.length > 0) selectedSectionId.value = sections[0].id;
+
+    // insert fields for answers
+    if (!props.isEditable) {
+        let newAnswers: any[] = [];
+        clonedSections.forEach((section: any) => {
+            if (section.item.__typename == "QuestionType") {
+                newAnswers.push({
+                    id: section.id,
+                    text: section.item.answerType == "SHORT" || section.item.answerType == "LONG" ? "" : undefined,
+                    option: undefined,
+                    options: section.item.answerType == "CHECKBOX" ? [] : undefined,
+                    rangeVal: section.item.answerType == "RANGE" ? section.item.minRange : undefined,
+                    date: undefined,
+                });
+            }
+        });
+
+        answers.splice(0, answers.length, ...newAnswers);
+    }
 });
 
 // ============ ADD SECTION
@@ -140,6 +164,12 @@ async function handleContentUpdate(sectionId: number, data: object) {
     });
 }
 
+function handleChangeAnswer(sectionId: number, data: any) {
+    const index = answers.findIndex(a => a.id == sectionId);
+    if (index !== -1) {
+        Object.assign(answers[index], data);
+    }
+}
 </script>
 
 <template>
@@ -167,6 +197,7 @@ async function handleContentUpdate(sectionId: number, data: object) {
                         :sectionId="section.id"
                         :isEditable="isEditable"
                         :updateContent="handleContentUpdate"
+                        :changeAnswer="handleChangeAnswer"
                     />
 
                     <div class="remove-section d-flex justify-content-end" v-if="selectedSectionId == section.id && isEditable">

@@ -15,7 +15,8 @@ import DateQuestion from './questionSections/DateQuestion.vue';
         },
         sectionId: string,
         isEditable: boolean,
-        updateContent: (sectionId: number, data: any) => void;
+        updateContent: (sectionId: number, data: any) => void,
+        changeAnswer: (sectionId: number, data: any) => void
     }>()
     
     const selectedType = ref(props.data.answerType);
@@ -36,21 +37,21 @@ import DateQuestion from './questionSections/DateQuestion.vue';
     });
 
     const selectedTypeProps = computed(() => {
-        if (['RADIO', 'CHECKBOX'].includes(selectedType.value)) {
-            return {
-                data: props.data,
-                isEditable: props.isEditable,
-                sectionId: props.sectionId,
-                questionType: selectedType.value, // pass to OptionedQuestion
-                updateContent: props.updateContent
-            };
-        }
-        return {
+        const sharedData = {
             data: props.data,
             isEditable: props.isEditable,
             sectionId: props.sectionId,
-            updateContent: props.updateContent
+            updateContent: props.updateContent,
+            changeAnswer: props.changeAnswer
         };
+
+        if (['RADIO', 'CHECKBOX'].includes(selectedType.value)) {
+            return {
+                questionType: selectedType.value, // pass to OptionedQuestion
+                ...sharedData
+            };
+        }
+        return sharedData;
     });
 
     function handleTypeChange(event: Event) {
