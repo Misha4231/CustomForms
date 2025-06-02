@@ -76,6 +76,8 @@ const updateProfile = async() => {
 }
 const handleFileUpdate = (file: File) => {
   newProfileData.value.avatar = file;
+  profile.value.avatar = URL.createObjectURL(file);
+  currentUserProfile.avatar = profile.value.avatar;
 };
 
 const handleNameUpdate = (name: string) => {

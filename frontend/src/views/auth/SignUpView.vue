@@ -25,7 +25,7 @@ const submitHandler = async (event: Event) => {
         errorMsg.value = '';
         const response = await api.post('/auth/registration/', JSON.stringify(userInput.value));
 
-        router.push({path: '/sign-in'})
+        window.location.href = '/sign-in';
         
     } catch (error) { // error handling
         const err = error as AxiosError<Object>; // specify a type

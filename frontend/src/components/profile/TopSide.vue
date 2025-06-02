@@ -28,7 +28,7 @@ const updateName = (event: Event) => {
 <template>
     <div class="mt-5 nav">
         <div class="mr-2 flex-column justify-content-center" style="width: 300px;">
-            <img :src="profile.avatar ? mediaHost + profile.avatar : '/user.png'"  class="rounded-circle" width="100" height="100" alt="avatar">
+            <img :src="profile.avatar ? ((profile.avatar as string).startsWith('blob') ? profile.avatar : mediaHost + profile.avatar) : '/user.png'"  class="rounded-circle" width="100" height="100" alt="avatar">
             <div class="mt-2" v-if="isEditable">
                 <label for="formFile" class="form-label">Choose new avatar</label>
                 <input type="file" id="formFile" class="form-control" accept=".png,.jpg,.jpeg" @change="handleFileChange">
